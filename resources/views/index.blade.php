@@ -134,7 +134,7 @@
        <div class="conocenos-container">
             <img src="img/instituto1.jpg" alt="Instituto">
             <div class="texto-inap">
-            <h2 class="titulo-inap">Conocenos</h2>
+            <h2 class="titulo-inap">Conocenos V</h2>
                 <p>
                     Somos un instituto dedicado a la formación y capacitación bíblica y ministerial.
                     Creemos en la enseñanza sólida de la Palabra de Dios y en el desarrollo espiritual
