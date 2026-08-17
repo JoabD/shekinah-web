@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    @vite('resources/js/app.js')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Instituto de formación y capacitación bíblica y ministerial. Formamos siervos comprometidos con la obra del Señor, fieles a la Palabra de Dios.">
