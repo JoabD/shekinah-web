@@ -1,0 +1,29 @@
+/* Base de diseño Material 3 para Shekinah. La migración de las vistas será gradual. */
+:root {
+    --md-sys-color-primary: #1a2744;
+    --md-sys-color-on-primary: #ffffff;
+    --md-sys-color-primary-container: #d9e2ff;
+    --md-sys-color-on-primary-container: #001a42;
+    --md-sys-color-secondary: #545f73;
+    --md-sys-color-on-secondary: #ffffff;
+    --md-sys-color-secondary-container: #d8e3f8;
+    --md-sys-color-on-secondary-container: #111c2e;
+    --md-sys-color-surface: #faf9ff;
+    --md-sys-color-on-surface: #1a1b20;
+    --md-sys-color-surface-container: #eeeef4;
+    --md-sys-color-surface-container-high: #e8e8ee;
+    --md-sys-color-outline: #747780;
+    --md-sys-color-error: #ba1a1a;
+    --md-sys-color-on-error: #ffffff;
+    --md-sys-color-error-container: #ffdad6;
+    --md-sys-color-on-error-container: #410002;
+    --md-sys-typescale-body-large-font: "Segoe UI", Arial, sans-serif;
+    --md-sys-typescale-body-medium-font: "Segoe UI", Arial, sans-serif;
+    --md-sys-typescale-title-large-font: "Segoe UI", Arial, sans-serif;
+    --md-sys-typescale-headline-small-font: "Segoe UI", Arial, sans-serif;
+    --md-sys-typescale-headline-medium-font: "Segoe UI", Arial, sans-serif;
+}
+
+/* Utilidades opt-in: no alteran las pantallas existentes. */
+.md3-surface { background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+.md3-card { background: var(--md-sys-color-surface-container-low, #f4f3f9); border-radius: 12px; padding: 1.5rem; }
