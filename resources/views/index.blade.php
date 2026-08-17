@@ -168,7 +168,7 @@
             font-weight: 600;
             font-size: 14px;
             color: #ffffff;
-            background: linear-gradient(135deg, #f1f1f1, #eaeaea);
+            background: linear-gradient(135deg, #ffffff, #ececec);
             padding: 11px 26px;
             border-radius: 30px;
             box-shadow: 0 6px 16px rgba(26, 39, 68, 0.25);
@@ -1007,7 +1007,7 @@
             <img src="{{ asset('img/instituto5.jpg') }}" class="activa" alt="Galería Instituto Shekina 1">
             <img src="{{ asset('img/instituto6.jpg') }}" alt="Galería Instituto Shekina 2">
             <img src="{{ asset('img/instituto3.jpg') }}" alt="Galería Instituto Shekina 3">
-            <img src="{{ asset('img/instituto4.jpg') }}" alt="Galería Instituto Shekina 4">
+            <img src="{{ asset('img/omstituto4.jpg') }}" alt="Galería Instituto Shekina 4">
             <img src="{{ asset('img/instituto7.jpg') }}" alt="Galería Instituto Shekina 5">
             <img src="{{ asset('img/instituto8.jpg') }}" alt="Galería Instituto Shekina 6">
 
