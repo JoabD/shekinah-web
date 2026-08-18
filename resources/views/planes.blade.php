@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Conoce la malla curricular del Instituto Shekina: seis cuatrimestres y un diplomado de formación bíblica y ministerial.">
     <link rel="icon" type="image/png" href="{{ asset('img/shekina_logo.png') }}">
-    <title>Planes de Estudio | Instituto Shekina</title>
+    <title>Planes de Estudio | Instituto Shekinah</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -372,6 +372,29 @@
             font-size: 14px;
             line-height: 1.6;
             margin: 0;
+        }
+
+        /* ===== CARRUSEL MÓVIL (tarjetas de estadísticas y malla) ===== */
+        .carrusel-puntos-mobil {
+            display: none;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .punto-mobil {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(26, 39, 68, 0.18);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .punto-mobil.activo {
+            background: #c8a250;
+            width: 22px;
+            border-radius: 6px;
         }
 
         /* ===== SECCIONES GENERALES ===== */
@@ -769,7 +792,29 @@
         @media (max-width: 640px) {
             .stats-grid,
             .planes-grid {
-                grid-template-columns: 1fr;
+                display: flex;
+                grid-template-columns: none;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                margin: 0 -24px;
+                padding: 4px 24px;
+            }
+
+            .stats-grid::-webkit-scrollbar,
+            .planes-grid::-webkit-scrollbar {
+                display: none;
+            }
+
+            .stat-card,
+            .plan-card {
+                flex: 0 0 100%;
+                scroll-snap-align: start;
+            }
+
+            .carrusel-puntos-mobil {
+                display: flex;
             }
 
             .foot-grid {
@@ -796,7 +841,7 @@
 <header id="header">
     <nav id="menu">
         <div id="menu-logo">
-            <img src="{{ asset('img/shekinah_logo.png') }}" alt="Logo Instituto Shekina" id="logo-img">
+            <img src="{{ asset('img/shekina_logo.png') }}" alt="Logo Instituto Shekina" id="logo-img">
             <div class="marca">Instituto Teologico Shekinah<span>Formación Bíblica y Ministerial</span></div>
         </div>
 
@@ -835,7 +880,7 @@
 
 <section id="stats">
     <div class="contenedor">
-        <div class="stats-grid">
+        <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
                 <div class="stat-icono"><i class="bi bi-calendar3"></i></div>
                 <h3>6 Cuatrimestres</h3>
@@ -857,6 +902,7 @@
                 <p>Áreas de estudio bíblico, teológico y ministerial.</p>
             </div>
         </div>
+        <div class="carrusel-puntos-mobil" id="statsPuntos"></div>
     </div>
 </section>
 
@@ -868,7 +914,7 @@
             <p>Cada cuatrimestre construye sobre el anterior, combinando fundamentos bíblicos, teología sistemática y preparación para el servicio.</p>
         </div>
 
-        <div class="planes-grid">
+        <div class="planes-grid" id="planesGrid">
             <div class="plan-card" id="Pcuatrimestre">
                 <div class="plan-numero">01</div>
                 <h3>Primer Cuatrimestre</h3>
@@ -935,6 +981,7 @@
                 </ul>
             </div>
         </div>
+        <div class="carrusel-puntos-mobil" id="planesPuntos"></div>
     </div>
 </section>
 
@@ -996,7 +1043,7 @@
                 </ul>
             </div>
             <div>
-                <h4>Instituto Shekina</h4>
+                <h4>Instituto Shekinah</h4>
                 <ul>
                     <li><a href="/#conocenos">Conócenos</a></li>
                     <li><a href="/#ofrecemos">Ofrecemos</a></li>
@@ -1006,7 +1053,7 @@
             </div>
         </div>
         <div class="foot-legal">
-            <span>&copy; <span id="anio"></span> ICAP A.R. — Instituto Shekina. Todos los derechos reservados.</span>
+            <span>&copy; <span id="anio"></span> ICAP A.R. — Instituto Shekinah. Todos los derechos reservados.</span>
         </div>
     </div>
 </footer>
@@ -1034,6 +1081,49 @@
             menuToggle.setAttribute('aria-expanded', 'false');
         });
     });
+
+    // Carrusel móvil (tarjetas de estadísticas y malla curricular)
+    function inicializarCarruselMovil(idGrid, idPuntos) {
+        const grid = document.getElementById(idGrid);
+        const puntosContenedor = document.getElementById(idPuntos);
+        if (!grid || !puntosContenedor) return;
+
+        const tarjetas = Array.from(grid.children);
+        puntosContenedor.innerHTML = '';
+        tarjetas.forEach((tarjeta, i) => {
+            const punto = document.createElement('span');
+            punto.classList.add('punto-mobil');
+            if (i === 0) punto.classList.add('activo');
+            punto.addEventListener('click', () => {
+                grid.scrollTo({ left: tarjeta.offsetLeft, behavior: 'smooth' });
+            });
+            puntosContenedor.appendChild(punto);
+        });
+        const puntos = puntosContenedor.querySelectorAll('.punto-mobil');
+
+        let ticking = false;
+        grid.addEventListener('scroll', () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                let indice = 0;
+                let menorDistancia = Infinity;
+                tarjetas.forEach((tarjeta, i) => {
+                    const distancia = Math.abs(tarjeta.offsetLeft - grid.scrollLeft);
+                    if (distancia < menorDistancia) {
+                        menorDistancia = distancia;
+                        indice = i;
+                    }
+                });
+                puntos.forEach(p => p.classList.remove('activo'));
+                if (puntos[indice]) puntos[indice].classList.add('activo');
+                ticking = false;
+            });
+        });
+    }
+
+    inicializarCarruselMovil('statsGrid', 'statsPuntos');
+    inicializarCarruselMovil('planesGrid', 'planesPuntos');
 </script>
 </body>
 </html>
