@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Instituto de formación y capacitación bíblica y ministerial. Formamos siervos comprometidos con la obra del Señor, fieles a la Palabra de Dios.">
     <link rel="icon" type="image/png" href="{{ asset('img/shekina_logo.png') }}">
-    <title>Instituto Shekina | Formación Bíblica y Ministerial</title>
+    <title>Instituto Shekinah | Formación Bíblica y Ministerial</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -167,7 +167,7 @@
             font-weight: 600;
             font-size: 14px;
             color: #ffffff;
-            background: linear-gradient(135deg, #ffffff, #ececec);
+            background: linear-gradient(135deg, #1a2744, #101c36);
             padding: 11px 26px;
             border-radius: 30px;
             box-shadow: 0 6px 16px rgba(26, 39, 68, 0.25);
@@ -844,8 +844,8 @@
 <header id="header">
     <nav id="menu">
         <div id="menu-logo">
-            <img src="{{ asset('img/shekinah_logo.png') }}" alt="Logo Instituto Shekina" id="logo-img">
-            <div class="marca">Instituto Shekina<span>Formación Bíblica y Ministerial</span></div>
+            <img src="{{ asset('img/shekina_logo.png') }}" alt="Logo Instituto Shekina" id="logo-img">
+            <div class="marca">Instituto Teologico Shekinah<span>Formación Bíblica y Ministerial</span></div>
         </div>
 
         <ul id="menu-links">
@@ -867,7 +867,7 @@
 <section id="hero">
     <div class="contenedor">
         <div class="hero-contenido">
-            <span class="eyebrow">Instituto Shekina</span>
+            <span class="eyebrow">Instituto Shekinah</span>
             <h1>Formación bíblica sólida para siervos comprometidos con la obra de Dios</h1>
             <p>
                 Capacitamos y formamos líderes fieles en el estudio de las Sagradas Escrituras,
@@ -1050,7 +1050,7 @@
                 </ul>
             </div>
             <div>
-                <h4>Instituto Shekina</h4>
+                <h4>Instituto Shekinah</h4>
                 <ul>
                     <li><a href="#conocenos">Conócenos</a></li>
                     <li><a href="#ofrecemos">Ofrecemos</a></li>
@@ -1060,12 +1060,11 @@
             </div>
         </div>
         <div class="foot-legal">
-            <span>&copy; <span id="anio"></span> ICAP A.R. — Instituto Shekina. Todos los derechos reservados.</span>
+            <span>&copy; <span id="anio"></span> ICAP A.R. — Instituto Shekinah. Todos los derechos reservados.</span>
         </div>
     </div>
 </footer>
 
-<script src="{{ asset('js/index.js') }}"></script>
 <script>
     // Año dinámico en el footer
     document.getElementById('anio').textContent = new Date().getFullYear();
