@@ -9,7 +9,7 @@ class SesionActiva
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!session('logueado')) {
+        if (! session('logueado')) {
             return redirect('/registro');
         }
 

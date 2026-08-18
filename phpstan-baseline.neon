@@ -1,0 +1,49 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property App\\Models\\Preregistro\:\:\$correo\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/AdminPreRegistroController.php
+
+		-
+			message: '#^Parameter \#1 \$import of static method Maatwebsite\\Excel\\Facades\\Excel\:\:toCollection\(\) expects object, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/PagosController.php
+
+		-
+			message: '#^Access to an undefined property App\\Mail\\PagosMail\:\:\$meses\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Mail/PagosMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Mail\\PagosMail\:\:\$nombre\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Mail/PagosMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Mail\\PagosMail\:\:\$notificacion\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Mail/PagosMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Mail\\RegistroMail\:\:\$contra\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Mail/RegistroMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Mail\\RegistroMail\:\:\$estatus\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Mail/RegistroMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Mail\\RegistroMail\:\:\$usuario\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Mail/RegistroMail.php

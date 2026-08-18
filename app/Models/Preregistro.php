@@ -10,7 +10,8 @@ class Preregistro extends Model
 
     protected $primaryKey = 'id_encuesta';
 
-    public $timestamps = false; 
+    public $timestamps = false;
+
     protected $fillable = [
         'nombre_completo',
         'fecha_nacimiento',
@@ -45,6 +46,6 @@ class Preregistro extends Model
         'fecha_registro',
         'archivos',
         'estatus',
-        'correo'
+        'correo',
     ];
 }
