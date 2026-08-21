@@ -17,6 +17,12 @@ Route::get('/inscripcion', [PreRegistroController::class, 'index']);
 Route::get('/planes', function () {
     return view('planes');
 });
+Route::get('/programas', function () {
+    return view('programas', [
+        'cuatrimestres' => config('materias.cuatrimestres'),
+        'diplomado' => config('materias.diplomado'),
+    ]);
+});
 Route::get('/contacto', function () {
     return view('contacto');
 });
