@@ -15,7 +15,7 @@ Route::get('/', function () {
 });
 Route::get('/inscripcion', [PreRegistroController::class, 'index']);
 Route::get('/planes', function () {
-    return view('planes');
+    return view('planes'); // Dude :v
 });
 Route::get('/programas', function () {
     return view('programas', [
