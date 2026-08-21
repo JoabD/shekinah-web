@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SesionActiva;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,8 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'sesion' => \App\Http\Middleware\SesionActiva::class,
+            'sesion' => SesionActiva::class,
         ]);
     })
-     ->withExceptions(function (Exceptions $exceptions) {
-    })->create();
+    ->withExceptions(function (Exceptions $exceptions) {})->create();

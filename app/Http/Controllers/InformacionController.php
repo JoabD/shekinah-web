@@ -1,15 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+
 class InformacionController extends Controller
 {
     public function index()
     {
-        $perfil = session('perfil'); 
-        $usuario = session('usuario'); 
+        $perfil = session('perfil');
+        $usuario = session('usuario');
         $informacion = collect();
         $informacion = \DB::table('USUARIOS as U')
             ->join('PREREGISTRO as G', 'G.ID_ENCUESTA', '=', 'U.ID_ENCUESTA')
@@ -19,8 +20,8 @@ class InformacionController extends Controller
 
         return view('informacion', compact('perfil', 'usuario', 'informacion'));
 
-        
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -74,5 +75,4 @@ class InformacionController extends Controller
 
         return redirect('/informacion')->with('success', 'Información actualizada correctamente.');
     }
-
 }

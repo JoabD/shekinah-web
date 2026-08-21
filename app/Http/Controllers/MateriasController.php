@@ -1,64 +1,60 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Preregistro;
-use Illuminate\Support\Str;
+
 class MateriasController extends Controller
 {
     public function index()
     {
-        $perfil = session('perfil'); 
-        $usuario = session('usuario'); 
+        $perfil = session('perfil');
+        $usuario = session('usuario');
         $materias = collect();
-        $profesores=collect();
-        $regiones=collect();
-        $periodo=collect();
-        $asignaciones=collect();
+        $profesores = collect();
+        $regiones = collect();
+        $periodo = collect();
+        $asignaciones = collect();
         if ($perfil == 1) {
-           $materias = DB::table('MATERIAS_ASIGNADAS as A')
-            ->join('MATERIAS as M', 'A.MATERIA', '=', 'M.ID_MATERIA')
+            $materias = DB::table('MATERIAS_ASIGNADAS as A')
+                ->join('MATERIAS as M', 'A.MATERIA', '=', 'M.ID_MATERIA')
+                ->join('USUARIOS as U_ALU', 'U_ALU.USUARIO', '=', 'A.ALUMNO')
+                ->join('PREREGISTRO as P_ALU', 'P_ALU.ID_ENCUESTA', '=', 'U_ALU.ID_ENCUESTA')
+                ->join('USUARIOS as U_PROF', 'U_PROF.USUARIO', '=', 'A.PROFESOR')
+                ->join('PREREGISTRO as P_PROF', 'P_PROF.ID_ENCUESTA', '=', 'U_PROF.ID_ENCUESTA')
+                ->join('REGION as R', 'R.ID_REGION', '=', 'A.REGION')
+                ->join('PERIODO as PE', 'PE.ID_PERIODO', '=', 'A.PERIODO')
+                ->where('A.ALUMNO', $usuario)
+                ->where('PE.ESTATUS', 1)
+                ->select([
+                    'P_ALU.NOMBRE_COMPLETO as alumno',
+                    'M.NOMBRE_MATERIA as materia',
+                    'PE.PERIODO',
+                    'A.CALIFICACION',
+                    'R.NOMBRE as region',
+                    'P_PROF.NOMBRE_COMPLETO as profesor',
+                ])
+                ->get();
 
-            ->join('USUARIOS as U_ALU', 'U_ALU.USUARIO', '=', 'A.ALUMNO')
-            ->join('PREREGISTRO as P_ALU', 'P_ALU.ID_ENCUESTA', '=', 'U_ALU.ID_ENCUESTA')
-
-            ->join('USUARIOS as U_PROF', 'U_PROF.USUARIO', '=', 'A.PROFESOR')
-            ->join('PREREGISTRO as P_PROF', 'P_PROF.ID_ENCUESTA', '=', 'U_PROF.ID_ENCUESTA')
-
-            ->join('REGION as R', 'R.ID_REGION', '=', 'A.REGION')
-            ->join('PERIODO as PE', 'PE.ID_PERIODO', '=', 'A.PERIODO')
-
-            ->where('A.ALUMNO', $usuario)
-            ->where('PE.ESTATUS', 1)
-
-            ->select([
-                'P_ALU.NOMBRE_COMPLETO as alumno',
-                'M.NOMBRE_MATERIA as materia',
-                'PE.PERIODO',
-                'A.CALIFICACION',
-                'R.NOMBRE as region',
-                'P_PROF.NOMBRE_COMPLETO as profesor'
-            ])
-            ->get();
             return view('materias', compact('materias'));
-        }else if($perfil==2){
+        } elseif ($perfil == 2) {
             $materias = DB::table('MATERIAS_ASIGNADAS as M')
-            ->join('MATERIAS as MA', 'MA.ID_MATERIA', '=', 'M.MATERIA')
-            ->join('REGION as R', 'R.ID_REGION', '=', 'M.REGION')
-            ->where('M.PROFESOR', $usuario)
-            ->where('M.PERIODO', function ($query) {
-                $query->select('ID_PERIODO')
-                    ->from('PERIODO')
-                    ->where('ESTATUS', 1);
-            })
-            ->whereNull('M.ALUMNO')
-            ->distinct()
-            ->select('MA.NOMBRE_MATERIA','M.ID' ,'M.MATERIA','R.NOMBRE as REGION','R.ID_REGION','M.PROFESOR','M.PERIODO')
-            ->get();
+                ->join('MATERIAS as MA', 'MA.ID_MATERIA', '=', 'M.MATERIA')
+                ->join('REGION as R', 'R.ID_REGION', '=', 'M.REGION')
+                ->where('M.PROFESOR', $usuario)
+                ->where('M.PERIODO', function ($query) {
+                    $query->select('ID_PERIODO')
+                        ->from('PERIODO')
+                        ->where('ESTATUS', 1);
+                })
+                ->whereNull('M.ALUMNO')
+                ->distinct()
+                ->select('MA.NOMBRE_MATERIA', 'M.ID', 'M.MATERIA', 'R.NOMBRE as REGION', 'R.ID_REGION', 'M.PROFESOR', 'M.PERIODO')
+                ->get();
 
             return view('materias', compact('materias'));
-        }else if($perfil==3){
+        } elseif ($perfil == 3) {
             $materias = DB::table('MATERIAS')
                 ->select('ID_MATERIA', 'NOMBRE_MATERIA', 'CUATRIMESTRE')
                 ->orderBy('CUATRIMESTRE', 'ASC')
@@ -93,7 +89,7 @@ class MateriasController extends Controller
                     'P.NOMBRE_COMPLETO as profesor',
                     'M.NOMBRE_MATERIA as materia',
                     'PE.PERIODO',
-                    'R.NOMBRE as region'
+                    'R.NOMBRE as region',
                 ])
                 ->get();
 
@@ -104,32 +100,33 @@ class MateriasController extends Controller
                 'periodo',
                 'asignaciones'
             ));
-        }else{
+        } else {
             return view('materias', compact('materias'));
         }
 
-        
     }
+
     public function asignar(Request $request)
     {
         $request->validate([
-            'materia'  => 'required|integer',
-            'periodo'  => 'required|integer',
+            'materia' => 'required|integer',
+            'periodo' => 'required|integer',
             'profesor' => 'required|integer',
-            'region'   => 'required|integer',
+            'region' => 'required|integer',
         ]);
 
         DB::table('MATERIAS_ASIGNADAS')->insert([
-            'MATERIA'  => $request->materia,
+            'MATERIA' => $request->materia,
             'PROFESOR' => $request->profesor,
-            'PERIODO'  => $request->periodo,
-            'REGION'   => $request->region,
+            'PERIODO' => $request->periodo,
+            'REGION' => $request->region,
         ]);
 
         return response()->json([
-            'ok' => true
+            'ok' => true,
         ]);
     }
+
     public function eliminar(Request $request)
     {
         DB::table('MATERIAS_ASIGNADAS')
@@ -138,28 +135,30 @@ class MateriasController extends Controller
 
         return redirect()->back()->with('success', 'Asignación eliminada correctamente');
     }
+
     public function asignarAlumnos()
     {
         try {
             DB::statement('CALL insertar_materias_alumnos()');
 
             return response()->json([
-                'ok' => true
+                'ok' => true,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'mensaje' => $e->getMessage()
+                'mensaje' => $e->getMessage(),
             ], 500);
         }
     }
+
     public function ver(Request $request)
     {
         $request->validate([
-            'materia'  => 'required|integer',
+            'materia' => 'required|integer',
             'profesor' => 'required|integer',
-            'periodo'  => 'required|integer',
-            'region'   => 'required|integer'
+            'periodo' => 'required|integer',
+            'region' => 'required|integer',
         ]);
 
         $resultados = DB::table('MATERIAS_ASIGNADAS as M')
@@ -176,15 +175,16 @@ class MateriasController extends Controller
                 'MA.NOMBRE_MATERIA',
                 'P.NOMBRE_COMPLETO',
                 'U.CUATRIMESTRE',
-                'M.CALIFICACION'
+                'M.CALIFICACION',
             ])
             ->get();
 
         return response()->json([
             'ok' => true,
-            'data' => $resultados
+            'data' => $resultados,
         ]);
     }
+
     public function guardarCalificacion(Request $request)
     {
         $request->validate([
@@ -195,12 +195,11 @@ class MateriasController extends Controller
         DB::table('MATERIAS_ASIGNADAS')
             ->where('ID', $request->id)
             ->update([
-                'CALIFICACION' => $request->calificacion
+                'CALIFICACION' => $request->calificacion,
             ]);
 
         return response()->json([
-            'ok' => true
+            'ok' => true,
         ]);
     }
-
 }

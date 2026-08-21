@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PreRegistroMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Mail\PreRegistroMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,15 +12,15 @@ class PreRegistroController extends Controller
 {
     public function create()
     {
-        return view('inscripcion'); 
+        return view('inscripcion');
     }
 
     public function index()
     {
         $regiones = DB::table('REGION')
-        ->select('ID_REGION', 'NOMBRE')
-        ->orderBy('ID_REGION', 'ASC')
-        ->get();
+            ->select('ID_REGION', 'NOMBRE')
+            ->orderBy('ID_REGION', 'ASC')
+            ->get();
 
         return view('inscripcion', compact('regiones'));
     }
@@ -49,32 +49,29 @@ class PreRegistroController extends Controller
             'proposito' => 'required|string',
             'formacion_teologica' => 'required|string|max:150',
             'escolaridad' => 'required|in:primaria,secundaria,bachillerato,otra',
-            
+
             'motivo_virtual' => 'nullable|string|max:200',
             'region' => 'nullable|string|max:150',
-            //'diplomado' => 'nullable|string|max:200',
+            // 'diplomado' => 'nullable|string|max:200',
 
             'documento_pdf' => 'nullable|file|mimes:pdf|max:5120',
-            'correo' => 'required|string|max:150'
+            'correo' => 'required|string|max:150',
         ]);
 
-       
         /*$archivoRuta = null;
 
         if ($request->hasFile('documento_pdf')) {
             $nombreArchivo = time() . '_' . $request->file('documento_pdf')->getClientOriginalName();
 
             $path = Storage::disk('gcs')->putFileAs(
-                '', 
+                '',
                 $request->file('documento_pdf'),
                 $nombreArchivo
             );
 
-            $archivoRuta = $path; 
+            $archivoRuta = $path;
         }*/
 
-
-        
         DB::table('PREREGISTRO')->insert([
             'nombre_completo' => $request->nombre_completo,
             'fecha_nacimiento' => $request->fecha,
@@ -107,22 +104,22 @@ class PreRegistroController extends Controller
             'motivo_virtual' => $request->motivo_virtual ?? null,
             'diplomado' => $request->has('diplomado') ? 1 : 0,
 
-            //'archivos' => $archivoRuta,
+            // 'archivos' => $archivoRuta,
             'estatus' => 0,
-            'correo' => $request->correo
+            'correo' => $request->correo,
         ]);
 
-        //$urlArchivo = null;
-            /*if ($archivoRuta) {
-                $urlArchivo = Storage::disk('gcs')->url($archivoRuta);
-            }*/
+        // $urlArchivo = null;
+        /*if ($archivoRuta) {
+            $urlArchivo = Storage::disk('gcs')->url($archivoRuta);
+        }*/
 
         $correos = DB::table('PREREGISTRO as P')
             ->join('USUARIOS as U', 'U.ID_ENCUESTA', '=', 'P.ID_ENCUESTA')
             ->where('U.PERFIL', 3)
             ->where('P.ESTATUS', 1)
             ->pluck('P.CORREO')
-            ->filter(); 
+            ->filter();
 
         if ($correos->isNotEmpty()) {
             Mail::to($correos)->send(new PreRegistroMail($request->all(), ''));

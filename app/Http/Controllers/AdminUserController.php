@@ -1,22 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Mail\RegistroMail;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use App\Models\Preregistro;
-use App\Models\Usuario;
-use App\Mail\RegistroMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+
 class AdminUserController extends Controller
 {
     public function index()
     {
         $perfil = collect();
-        $perfil2 = collect(); 
-        $usuario = collect(); 
-        $regiones = collect(); 
+        $perfil2 = collect();
+        $usuario = collect();
+        $regiones = collect();
         $perfil = DB::table('PERFILES')
             ->select('ID_PERFIL', 'NOMBRE')
             ->where('ID_PERFIL', '>', 1)
@@ -27,32 +28,33 @@ class AdminUserController extends Controller
             ->orderBy('ID_PERFIL', 'ASC')
             ->get();
         $regiones = DB::table('REGION')
-                ->select('ID_REGION', 'NOMBRE')
-                ->get();
+            ->select('ID_REGION', 'NOMBRE')
+            ->get();
         $usuario = DB::table('PREREGISTRO as P')
-        ->join('USUARIOS as U', 'P.ID_ENCUESTA', '=', 'U.ID_ENCUESTA')
-        ->join('PERFILES as PE', 'PE.ID_PERFIL', '=', 'U.PERFIL')
-        ->select(
-            'U.USUARIO',
-            'P.NOMBRE_COMPLETO',
-            'P.FECHA_NACIMIENTO',
-            'P.DOMICILIO',
-            'P.IGLESIA',
-            'P.DOMICILIO_IGLESIA',
-            'P.CARGO_NOMBRE',
-            'P.PASTOR',
-            'P.CORREO',
-            'PE.NOMBRE as PERFIL',
-            'U.CUATRIMESTRE',
-            DB::raw("CASE 
+            ->join('USUARIOS as U', 'P.ID_ENCUESTA', '=', 'U.ID_ENCUESTA')
+            ->join('PERFILES as PE', 'PE.ID_PERFIL', '=', 'U.PERFIL')
+            ->select(
+                'U.USUARIO',
+                'P.NOMBRE_COMPLETO',
+                'P.FECHA_NACIMIENTO',
+                'P.DOMICILIO',
+                'P.IGLESIA',
+                'P.DOMICILIO_IGLESIA',
+                'P.CARGO_NOMBRE',
+                'P.PASTOR',
+                'P.CORREO',
+                'PE.NOMBRE as PERFIL',
+                'U.CUATRIMESTRE',
+                DB::raw("CASE 
                         WHEN P.PRESENCIAL = 1 THEN 'Presencial'
                         ELSE 'Virtual'
                     END AS MODALIDAD"),
-            'U.ID_ENCUESTA'
-        )
-        ->where('P.ESTATUS', 1)
-        ->orderBy('U.USUARIO','desc')
-        ->get();
+                'U.ID_ENCUESTA'
+            )
+            ->where('P.ESTATUS', 1)
+            ->orderBy('U.USUARIO', 'desc')
+            ->get();
+
         return view('adminUser', compact(
             'perfil',
             'usuario',
@@ -60,6 +62,7 @@ class AdminUserController extends Controller
             'regiones'
         ));
     }
+
     public function store(Request $request)
     {
         try {
@@ -82,7 +85,7 @@ class AdminUserController extends Controller
                 'localidad_iglesia' => 'required|string',
                 'municipio_iglesia' => 'required|string',
                 'perfil' => 'required|string',
-                'region' => 'required|string'
+                'region' => 'required|string',
             ]);
 
             $datos = [
@@ -114,9 +117,9 @@ class AdminUserController extends Controller
             $passwordPlano = Str::random(10);
 
             $usuarioCreado = Usuario::create([
-                'CONTRASEÑA'  => Hash::make($passwordPlano),
+                'CONTRASEÑA' => Hash::make($passwordPlano),
                 'ID_ENCUESTA' => $idEncuesta,
-                'PERFIL' => $request->perfil
+                'PERFIL' => $request->perfil,
             ]);
 
             $usuario = $usuarioCreado->USUARIO;
@@ -132,20 +135,21 @@ class AdminUserController extends Controller
         }
     }
 
-    public function datos($id){
+    public function datos($id)
+    {
         $datos = DB::table('PREREGISTRO as p')
-        ->join('USUARIOS as u', 'p.id_encuesta', '=', 'u.id_encuesta')
-        ->select(
-            'p.estatus',
-            'p.region',
-            'p.presencial',
-            'p.virtual1',
-            'p.diplomado',
-            'u.perfil',
-            'u.cuatrimestre'
-        )
-        ->where('p.id_encuesta', $id)
-        ->get(); 
+            ->join('USUARIOS as u', 'p.id_encuesta', '=', 'u.id_encuesta')
+            ->select(
+                'p.estatus',
+                'p.region',
+                'p.presencial',
+                'p.virtual1',
+                'p.diplomado',
+                'u.perfil',
+                'u.cuatrimestre'
+            )
+            ->where('p.id_encuesta', $id)
+            ->get();
 
         return response()->json($datos);
     }
@@ -156,10 +160,10 @@ class AdminUserController extends Controller
         DB::table('USUARIOS')
             ->where('id_encuesta', $request->id_encuesta)
             ->update([
-                'perfil' => $request->perfil
+                'perfil' => $request->perfil,
             ]);
 
-        if($request->perfil == 1){
+        if ($request->perfil == 1) {
 
             DB::table('PREREGISTRO')
                 ->where('id_encuesta', $request->id_encuesta)
@@ -168,37 +172,37 @@ class AdminUserController extends Controller
                     'region' => $request->region,
                     'presencial' => $request->modalidad == 1 ? 1 : 0,
                     'diplomado' => $request->modalidad == 2 ? 1 : 0,
-                    'virtual1' => $request->modalidad == 3 ? 1 : 0
+                    'virtual1' => $request->modalidad == 3 ? 1 : 0,
                 ]);
 
-        }else if($request->perfil == 4){
+        } elseif ($request->perfil == 4) {
             DB::table('PREREGISTRO')
                 ->where('id_encuesta', $request->id_encuesta)
                 ->update([
                     'estatus' => $request->estatus,
-                    'region' => $request->region
-                    
+                    'region' => $request->region,
+
                 ]);
-        }else{
+        } else {
 
             DB::table('PREREGISTRO')
                 ->where('id_encuesta', $request->id_encuesta)
                 ->update([
-                    'estatus' => $request->estatus
+                    'estatus' => $request->estatus,
                 ]);
 
         }
 
-        if($request->password){
+        if ($request->password) {
             DB::table('USUARIOS')
                 ->where('id_encuesta', $request->id_encuesta)
                 ->update([
-                    'contraseña' => Hash::make($request->password)
+                    'contraseña' => Hash::make($request->password),
                 ]);
         }
 
         return response()->json([
-            "status" => "ok"
+            'status' => 'ok',
         ]);
     }
 }

@@ -1,20 +1,21 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Mail\PagosMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Mail\PagosMail;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
+
 class PagosController extends Controller
 {
     public function index()
     {
-        $perfil = session('perfil'); 
-        $usuario = session('usuario'); 
+        $perfil = session('perfil');
+        $usuario = session('usuario');
         $region = session('region');
-        
+
         $query = "
         WITH RECURSIVE meses AS (
             SELECT 
@@ -74,11 +75,11 @@ class PagosController extends Controller
         $params = [];
 
         if ($perfil == 4) {
-            $query .= " AND PRE.REGION = :region ";
+            $query .= ' AND PRE.REGION = :region ';
             $params['region'] = $region;
         }
 
-        $query .= " ORDER BY U.USUARIO, PER.periodo_mes ";
+        $query .= ' ORDER BY U.USUARIO, PER.periodo_mes ';
 
         $pagos = collect(DB::select($query, $params));
 
@@ -109,12 +110,11 @@ class PagosController extends Controller
 
         return view('pagos', compact('pagos', 'periodosPago'));
     }
- 
 
     public function importar(Request $request)
     {
         $request->validate([
-            'archivo' => 'required|mimes:csv,xlsx'
+            'archivo' => 'required|mimes:csv,xlsx',
         ]);
 
         try {
@@ -127,7 +127,7 @@ class PagosController extends Controller
             $encabezados = $data->first()->toArray();
             $encabezados = array_map('strtoupper', $encabezados);
 
-            if (!in_array('USUARIO', $encabezados) || !in_array('PERIODO', $encabezados)) {
+            if (! in_array('USUARIO', $encabezados) || ! in_array('PERIODO', $encabezados)) {
                 return back()->with('error', 'El archivo debe contener las columnas: USUARIO y PERIODO');
             }
 
@@ -143,26 +143,28 @@ class PagosController extends Controller
                 $usuario = $filaArray[0] ?? null;
                 $periodo = $filaArray[1] ?? null;
 
-                if (!is_numeric($usuario) || !is_numeric($periodo)) {
+                if (! is_numeric($usuario) || ! is_numeric($periodo)) {
                     $errores[] = "Fila $filaNumero: valores no numéricos";
                     $filaNumero++;
+
                     continue;
                 }
 
-                if (!preg_match('/^\d{6}$/', $periodo)) {
+                if (! preg_match('/^\d{6}$/', $periodo)) {
                     $errores[] = "Fila $filaNumero: periodo inválido (debe ser YYYYMM)";
                     $filaNumero++;
+
                     continue;
                 }
 
                 DB::table('PAGOS')->updateOrInsert(
                     [
                         'USUARIO' => $usuario,
-                        'PERIODO' => $periodo
+                        'PERIODO' => $periodo,
                     ],
                     []
                 );
-                
+
                 DB::table('USUARIOS')
                     ->where('USUARIO', $usuario)
                     ->update(['PAGOS' => 0]);
@@ -174,20 +176,20 @@ class PagosController extends Controller
             if (count($errores) > 0) {
                 return back()->with([
                     'success' => "Se importaron $insertados registros",
-                    'errores_detalle' => $errores
+                    'errores_detalle' => $errores,
                 ]);
             }
 
             return back()->with('success', "Se importaron $insertados registros correctamente");
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al procesar el archivo: ' . $e->getMessage());
+            return back()->with('error', 'Error al procesar el archivo: '.$e->getMessage());
         }
     }
 
     public function filtrar(Request $request)
     {
-        $perfil = session('perfil'); 
+        $perfil = session('perfil');
         $region = session('region');
         $periodo = $request->periodo;
 
@@ -245,16 +247,16 @@ class PagosController extends Controller
         $params = [];
 
         if ($perfil == 4) {
-            $query .= " AND PRE.REGION = :region ";
+            $query .= ' AND PRE.REGION = :region ';
             $params['region'] = $region;
         }
 
         if ($periodo != -1) {
-            $query .= " AND PER.periodo_mes = :periodo ";
+            $query .= ' AND PER.periodo_mes = :periodo ';
             $params['periodo'] = $periodo;
         }
 
-        $query .= " ORDER BY U.USUARIO, PER.periodo_mes ";
+        $query .= ' ORDER BY U.USUARIO, PER.periodo_mes ';
 
         $data = collect(DB::select($query, $params));
 
@@ -264,12 +266,12 @@ class PagosController extends Controller
     public function notificar(Request $request)
     {
         $region = session('region');
-        $perfil = session('perfil'); 
+        $perfil = session('perfil');
 
         $usuario = $request->usuario;
         $pagos = $request->pagos;
 
-        $params = []; 
+        $params = [];
 
         $query = "
             SELECT DISTINCT
@@ -335,12 +337,12 @@ class PagosController extends Controller
         ";
 
         if ($perfil == 4) {
-            $query .= " AND PRE.REGION = :region ";
+            $query .= ' AND PRE.REGION = :region ';
             $params['region'] = $region;
         }
 
         if ($usuario != -1) {
-            $query .= " AND U.USUARIO = :usuario ";
+            $query .= ' AND U.USUARIO = :usuario ';
             $params['usuario'] = $usuario;
         }
 
@@ -377,14 +379,14 @@ class PagosController extends Controller
         ";
 
         $resultados = DB::select($query, $params);
-        
+
         foreach ($resultados as $row) {
-            if (!empty($row->CORREO)) {
+            if (! empty($row->CORREO)) {
                 Mail::to($row->CORREO)->send(
                     new PagosMail(
-                        $row->NOMBRE_COMPLETO,   
-                        $row->NOTIFICACION,      
-                        $row->MESES_DEBE        
+                        $row->NOMBRE_COMPLETO,
+                        $row->NOTIFICACION,
+                        $row->MESES_DEBE
                     )
                 );
 
@@ -396,15 +398,14 @@ class PagosController extends Controller
         DB::table('USUARIOS')
             ->whereIn('USUARIO', $usuarios)
             ->update([
-                'PAGOS' => DB::raw('PAGOS + 1')
+                'PAGOS' => DB::raw('PAGOS + 1'),
             ]);
 
         return response()->json([
             'success' => true,
             'usuario' => $usuario,
             'pagos' => $pagos,
-            'data' => $resultados
+            'data' => $resultados,
         ]);
     }
-    
 }

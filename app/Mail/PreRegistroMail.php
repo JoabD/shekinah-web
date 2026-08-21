@@ -10,10 +10,11 @@ class PreRegistroMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $data; 
+    public $data;
+
     public $urlArchivo;
 
-     public function __construct($data, $urlArchivo = null)
+    public function __construct($data, $urlArchivo = null)
     {
         $this->data = $data;
         $this->urlArchivo = $urlArchivo;
@@ -22,11 +23,10 @@ class PreRegistroMail extends Mailable
     public function build()
     {
         return $this->subject('Nueva solicitud de pre-registro')
-                    ->markdown('emails.preregistro')
-                    ->with([
-                        'data' => $this->data,
-                        'urlArchivo' => $this->urlArchivo,
-                    ]);
+            ->markdown('emails.preregistro')
+            ->with([
+                'data' => $this->data,
+                'urlArchivo' => $this->urlArchivo,
+            ]);
     }
-
 }
